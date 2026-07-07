@@ -77,8 +77,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
     val context = LocalContext.current
     var isLowResIconsEnabled by remember { mutableStateOf(Prefs[Prefs.RPC_USE_LOW_RES_ICON, false]) }
     var useImgur by remember { mutableStateOf(Prefs[Prefs.USE_IMGUR, false]) }
-    var configsDir by remember { mutableStateOf(Prefs[Prefs.CONFIGS_DIRECTORY, ""]) }
-    var showDirConfigDialog by remember { mutableStateOf(false) }
+
     var useButtonConfigs by remember { mutableStateOf(Prefs[Prefs.USE_RPC_BUTTONS, false]) }
     var showButtonsConfigDialog by remember { mutableStateOf(false) }
     var rpcButtons by remember {
@@ -87,12 +86,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
     var customActivityStatus by remember {
         mutableStateOf(Prefs[Prefs.CUSTOM_ACTIVITY_STATUS, "dnd"])
     }
-    var customActivityType by remember {
-        mutableStateOf(Prefs[Prefs.CUSTOM_ACTIVITY_TYPE, 0].toString())
-    }
-    var showActivityTypeDialog by remember {
-        mutableStateOf(false)
-    }
+
     var showActivityStatusDialog by remember {
         mutableStateOf(false)
     }
@@ -102,9 +96,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
     var showImgurClientIdDialog by remember {
         mutableStateOf(false)
     }
-    var setLastRunRpcConfigOption by remember {
-        mutableStateOf(Prefs[Prefs.APPLY_FIELDS_FROM_LAST_RUN_RPC, false])
-    }
+
     var customApplicationId by remember { mutableStateOf(Prefs[Prefs.CUSTOM_ACTIVITY_APPLICATION_ID, ""]) }
     var imgurClientId by remember { mutableStateOf(Prefs[Prefs.IMGUR_CLIENT_ID, Constants.IMGUR_CLIENT_ID]) }
 
@@ -120,17 +112,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
             item {
                 Subtitle(text = stringResource(R.string.general_settings))
             }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                item {
-                    SettingItem(
-                        title = stringResource(id = R.string.configs_directory),
-                        description = configsDir.ifEmpty { stringResource(id = R.string.custom_rpc_directory) },
-                        icon = Icons.Default.Storage,
-                    ) {
-                        showDirConfigDialog = true
-                    }
-                }
-            }
+
             item {
                 PreferenceSwitch(
                     title = stringResource(id = R.string.use_custom_buttons),
@@ -153,16 +135,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
                     }
                 }
             }
-            item {
-                SettingItem(
-                    title = stringResource(id = R.string.custom_activity_type),
-                    description = stringResource(id = R.string.custom_activity_type_desc),
-                    icon = Icons.Default.Code
-                ) {
-                    showActivityTypeDialog = true
-                }
 
-            }
             item {
                 SettingItem(
                     title = stringResource(id = R.string.custom_activity_status),
@@ -172,17 +145,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
                     showActivityStatusDialog = true
                 }
             }
-            item {
-                PreferenceSwitch(
-                    title = stringResource(R.string.set_previous_run_config_in_custom_rpc),
-                    description = stringResource(R.string.set_previous_run_config_in_custom_rpc_desc),
-                    icon = Icons.Default.Cached,
-                    isChecked = setLastRunRpcConfigOption
-                ) {
-                    setLastRunRpcConfigOption = !setLastRunRpcConfigOption
-                    Prefs[Prefs.APPLY_FIELDS_FROM_LAST_RUN_RPC] = setLastRunRpcConfigOption
-                }
-            }
+
             item {
                 SettingItem(
                     title = stringResource(id = R.string.custom_application_id),
@@ -241,37 +204,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
                 }
             }
         }
-        if (showDirConfigDialog) {
-            AlertDialog(
-                onDismissRequest = { showDirConfigDialog = false },
-                confirmButton = {},
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Storage, contentDescription = null
-                    )
-                },
-                title = { Text(stringResource(R.string.select_directory)) },
-                text = {
-                    Column {
-                        SingleChoiceItem(
-                            text = Constants.APP_DIRECTORY,
-                            selected = configsDir == Constants.APP_DIRECTORY
-                        ) {
-                            configsDir = Constants.APP_DIRECTORY
-                            Prefs[Prefs.CONFIGS_DIRECTORY] = configsDir
-                            showDirConfigDialog = false
-                        }
-                        SingleChoiceItem(
-                            text = Constants.DOWNLOADS_DIRECTORY,
-                            selected = configsDir == Constants.DOWNLOADS_DIRECTORY
-                        ) {
-                            configsDir = Constants.DOWNLOADS_DIRECTORY
-                            Prefs[Prefs.CONFIGS_DIRECTORY] = configsDir
-                            showDirConfigDialog = false
-                        }
-                    }
-                })
-        }
+
         if (showButtonsConfigDialog) {
             AlertDialog(
                 properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -330,66 +263,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
                 })
         }
 
-        if (showActivityTypeDialog) {
-            AlertDialog(
-                onDismissRequest = {
-                    showActivityTypeDialog = false
-                },
-                text = {
-                    var activityTypeisExpanded by remember {
-                        mutableStateOf(false)
-                    }
-                    val icon =
-                        if (activityTypeisExpanded) {
-                            Icons.Default.KeyboardArrowUp
-                        } else {
-                            Icons.Default.KeyboardArrowDown
-                        }
-                    RpcField(
-                        value = customActivityType,
-                        label = R.string.activity_type,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        trailingIcon = {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                modifier = Modifier.clickable {
-                                    activityTypeisExpanded = !activityTypeisExpanded
-                                })
-                        }) {
-                        customActivityType = it
-                    }
-                    DropdownMenu(
-                        expanded = activityTypeisExpanded, onDismissRequest = {
-                            activityTypeisExpanded = !activityTypeisExpanded
-                        }, modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Constants.ACTIVITY_TYPE.forEach { (label, value) ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = label)
-                                },
-                                onClick = {
-                                    customActivityType = value.toString()
-                                    activityTypeisExpanded = false
-                                },
-                            )
-                        }
-                    }
 
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        if (customActivityType.toInt() in 0..5) {
-                            Prefs[Prefs.CUSTOM_ACTIVITY_TYPE] = customActivityType.toInt()
-                            showActivityTypeDialog = false
-                        }
-                    }) {
-                        Text(text = stringResource(R.string.save))
-                    }
-                }
-            )
-        }
 
         if (showActivityStatusDialog) {
             AlertDialog(
