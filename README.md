@@ -2,7 +2,6 @@
 
 <div align="center">
 <img src="https://img.shields.io/badge/Minimum%20SDK-27-%23?&style=flat-square&color=5b5ef7">
-<img src="https://img.shields.io/github/downloads/UniverseKing4/Discord-App-RPC/total?&style=flat-square&color=5b5ef7">
 <a href="https://github.com/UniverseKing4/Discord-App-RPC/releases/latest">
 <img alt="Release" src="https://img.shields.io/github/v/release/UniverseKing4/Discord-App-RPC?&style=flat-square&color=5b5ef7&display_name=release">
 </a>
