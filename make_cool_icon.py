@@ -10,7 +10,7 @@ bg = Image.new("RGBA", (width, height), (0, 0, 0, 255))
 # 2. Foreground Image (Transparent)
 fg = Image.new("RGBA", (width, height), (0, 0, 0, 0))
 try:
-    font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 350)
+    font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 220)
 except:
     font = ImageFont.load_default()
 
