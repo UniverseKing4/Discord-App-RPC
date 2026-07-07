@@ -200,6 +200,7 @@ fun RpcSettings(onBackPressed: () -> Boolean) {
                 ) {
                     Prefs.remove(Prefs.SAVED_IMAGES)
                     Prefs.remove(Prefs.SAVED_ARTWORK)
+                    com.my.rpc.data.rpc.RpcImage.clearCache()
                     Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show()
                 }
             }

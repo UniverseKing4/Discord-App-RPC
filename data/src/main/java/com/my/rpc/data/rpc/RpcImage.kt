@@ -26,6 +26,44 @@ import kotlinx.serialization.json.Json
 sealed class RpcImage {
     abstract suspend fun resolveImage(repository: RpcRepository): String?
 
+    companion object {
+        private var savedAppIcons: HashMap<String, String>? = null
+        private var savedArtworks: HashMap<String, String>? = null
+
+        fun getSavedAppIcons(): HashMap<String, String> {
+            if (savedAppIcons == null) {
+                val data = Prefs[Prefs.SAVED_IMAGES, "{}"]
+                savedAppIcons = try { Json.decodeFromString(data) } catch (e: Exception) { HashMap() }
+            }
+            return savedAppIcons!!
+        }
+
+        fun saveAppIcon(packageName: String, url: String) {
+            val map = getSavedAppIcons()
+            map[packageName] = url
+            Prefs[Prefs.SAVED_IMAGES] = Json.encodeToString(map)
+        }
+
+        fun getSavedArtworks(): HashMap<String, String> {
+            if (savedArtworks == null) {
+                val data = Prefs[Prefs.SAVED_ARTWORK, "{}"]
+                savedArtworks = try { Json.decodeFromString(data) } catch (e: Exception) { HashMap() }
+            }
+            return savedArtworks!!
+        }
+
+        fun saveArtwork(schema: String, url: String) {
+            val map = getSavedArtworks()
+            map[schema] = url
+            Prefs[Prefs.SAVED_ARTWORK] = Json.encodeToString(map)
+        }
+
+        fun clearCache() {
+            savedAppIcons = null
+            savedArtworks = null
+        }
+    }
+
     class DiscordImage(val image: String) : RpcImage() {
         override suspend fun resolveImage(repository: RpcRepository): String {
             return "mp:${image}"
@@ -39,10 +77,8 @@ sealed class RpcImage {
     }
 
     class ApplicationIcon(val packageName: String, private val context: Context) : RpcImage() {
-        val data = Prefs[Prefs.SAVED_IMAGES, "{}"]
-        private val savedImages: HashMap<String, String> = Json.decodeFromString(data)
-
         override suspend fun resolveImage(repository: RpcRepository): String? {
+            val savedImages = getSavedAppIcons()
             return if (savedImages.containsKey(packageName))
                 savedImages[packageName]
             else
@@ -58,8 +94,7 @@ sealed class RpcImage {
             val bitmap = applicationInfo.toBitmap(context)
             val response = repository.uploadImage(bitmap.toFile(context, "image"))
             response?.let {
-                savedImages[packageName] = it
-                Prefs[Prefs.SAVED_IMAGES] = Json.encodeToString(savedImages)
+                saveAppIcon(packageName, it)
             }
             return response
         }
@@ -72,16 +107,14 @@ sealed class RpcImage {
         val title: String,
     ) : RpcImage() {
         override suspend fun resolveImage(repository: RpcRepository): String? {
-            val data = Prefs[Prefs.SAVED_ARTWORK, "{}"]
             val schema = "${this.packageName}:${this.title}"
-            val savedImages = Json.decodeFromString<HashMap<String, String>>(data)
+            val savedImages = getSavedArtworks()
             return if (savedImages.containsKey(schema))
                 savedImages[schema]
             else {
                 val result = repository.uploadImage(bitmap.toFile(this.context, "art"))
                 result?.let {
-                    savedImages[schema] = it
-                    Prefs[Prefs.SAVED_ARTWORK] = Json.encodeToString(savedImages)
+                    saveArtwork(schema, it)
                 }
                 result
             }
