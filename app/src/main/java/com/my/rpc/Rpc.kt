@@ -26,7 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.my.rpc.domain.model.toVersion
+
 import com.my.rpc.feature_about.about.About
 import com.my.rpc.feature_about.about.Credits
 import com.my.rpc.feature_about.about.CreditsScreenViewModel

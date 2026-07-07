@@ -12,7 +12,6 @@
 
 package com.my.rpc.preference
 
-import com.my.rpc.domain.model.release.Release
 import com.my.rpc.domain.model.user.User
 import com.my.rpc.preference.Prefs.isMediaAppEnabled
 import com.my.rpc.preference.Prefs.saveMediaAppToPrefs
@@ -106,17 +105,7 @@ object Prefs {
         }
     }
 
-    fun getSavedLatestRelease(): Release? {
-        val json = get(LATEST_RELEASE, "")
-        return when {
-            json.isNotEmpty() -> Json.decodeFromString(json)
-            else -> null
-        }
-    }
 
-    fun saveLatestRelease(release: Release) {
-        set(LATEST_RELEASE, Json.encodeToString(release))
-    }
 
     fun checkAndAutoDeleteSavedImages() {
         val lastDeleted = get(
@@ -182,7 +171,6 @@ object Prefs {
     const val APPLY_FIELDS_FROM_LAST_RUN_RPC = "enable_setting_from_last_config"
     const val CUSTOM_ACTIVITY_STATUS = "custom_activity_status"
 
-    const val LATEST_RELEASE = "latest_release"
 
     // Last Deleted Time of Saved Images
     const val LAST_DELETED = "last_deleted"

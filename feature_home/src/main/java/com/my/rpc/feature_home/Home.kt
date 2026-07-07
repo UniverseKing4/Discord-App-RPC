@@ -68,7 +68,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
-import com.my.rpc.domain.model.toVersion
+
 import com.my.rpc.domain.model.user.User
 import com.my.rpc.feature_home.feature.Features
 import com.my.rpc.feature_home.feature.HomeFeature
