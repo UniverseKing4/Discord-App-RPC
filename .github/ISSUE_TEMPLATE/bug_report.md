@@ -27,7 +27,7 @@ If applicable, add screenshots to help explain your problem.
 **Please complete the following information:**
  - Device: [e.g. OnePlus 7]
  - OS: [e.g. android 12]
- - Kizzy Version [3.2]
+ - Discord App RPC Version [1.0.0]
 
 **Additional context**
 Add any other context about the problem here.

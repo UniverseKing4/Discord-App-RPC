@@ -70,7 +70,7 @@ class ApiService @Inject constructor(
 
     suspend fun checkForUpdate() = runCatching {
         client.get {
-            url("$githubBaseUrl/repos/dead8309/Rpc/releases/latest")
+            url("$githubBaseUrl/repos/UniverseKing4/Discord-App-RPC/releases/latest")
         }
     }
 }

@@ -1,6 +1,3 @@
-<div align="center">
-    <img src="https://user-images.githubusercontent.com/68665948/207296272-d1985003-1681-4df4-b8ea-ca71f2043f89.png">
-</div>
 <br>
 
 <div align="center">
@@ -17,9 +14,6 @@
 <div align="center">
 <h1>Discord App RPC</h1>
 <h4>An ultra-optimized, highly efficient Discord Rich Presence manager for Android, written in Kotlin.</h4>
-<p>
-<img src="https://user-images.githubusercontent.com/68665948/207303492-c537af75-0d63-49e9-91c5-97114d974883.png" width=60%/>
-</p>
 </div>
 
 ## 🌟 About The App
