@@ -23,6 +23,8 @@ import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.os.Handler
+import android.os.Looper
 import android.os.Build
 import android.os.IBinder
 import com.my.rpc.data.get_current_data.app.GetCurrentlyRunningApp
@@ -480,7 +482,7 @@ class Rpc : Service() {
             currentMediaController = mediaSessions.firstOrNull {
                 enabledRpcApps.contains(it.packageName)
             }
-            currentMediaController?.registerCallback(mediaControllerCallback)
+            currentMediaController?.registerCallback(mediaControllerCallback, Handler(Looper.getMainLooper()))
         }
 
         scope.coroutineContext.cancelChildren()
@@ -512,7 +514,7 @@ class Rpc : Service() {
             currentMediaController = mediaSessions.firstOrNull {
                 enabledRpcApps.contains(it.packageName)
             }
-            currentMediaController?.registerCallback(mediaControllerCallback)
+            currentMediaController?.registerCallback(mediaControllerCallback, Handler(Looper.getMainLooper()))
         }
 
         val richMediaData = getCurrentPlayingMediaAll()
