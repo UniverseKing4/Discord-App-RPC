@@ -29,6 +29,7 @@ data class UiState(
     val appActivityTypes: Map<String, Int> = emptyMap(), // pkg -> activity type
     val isAppsLoading: Boolean = false,
     val showCoverArt: Boolean = true,
+    val showAlbumName: Boolean = true,
     val showAppIcon: Boolean = false,
     val showPlaybackState: Boolean = true,
     val showAppAndPauseIcon: Boolean = false,

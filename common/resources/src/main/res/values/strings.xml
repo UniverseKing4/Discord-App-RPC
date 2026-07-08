@@ -215,6 +215,8 @@
     <string name="completion_app_name">Detected App Name</string>
     <string name="show_cover_art">Show Cover Art</string>
     <string name="show_cover_art_desc">Display album cover art as large image</string>
+    <string name="show_album_name">Show Album Name</string>
+    <string name="show_album_name_desc">Display album name as large text</string>
     <string name="enable_rpc">Enable RPC</string>
     <string name="completion_media_author">Main Author</string>
     <string name="imgur_client_id">Imgur Client ID</string>

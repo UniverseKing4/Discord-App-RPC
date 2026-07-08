@@ -226,6 +226,7 @@ object Prefs {
     const val RPC_TEMPLATE_STATE = "rpc_template_state"
     const val RPC_APP_ACTIVITY_TYPES = "rpc_app_activity_types"
     const val RPC_SHOW_COVER_ART = "rpc_show_cover_art"
+    const val RPC_SHOW_ALBUM_NAME = "rpc_show_album_name"
     const val RPC_SHOW_APP_ICON = "rpc_show_app_icon"
     const val RPC_SHOW_PLAYBACK_STATE = "rpc_show_playback_state"
     const val RPC_SHOW_APP_AND_PAUSE_ICON = "rpc_show_app_and_pause_icon"

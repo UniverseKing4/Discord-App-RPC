@@ -83,18 +83,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    features: List<HomeFeature>,
     user: User?,
     navigateToProfile: () -> Unit,
     navigateToStyleAndAppearance: () -> Unit,
     navigateToAbout: () -> Unit,
     navigateToRpcSettings: () -> Unit,
     navigateToLogsScreen: () -> Unit,
+    rpcContent: @Composable () -> Unit,
 ) {
     val ctx = LocalContext.current
-    var homeItems by remember {
-        mutableStateOf(features)
-    }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val scrollBehavior =
@@ -102,12 +99,6 @@ fun Home(
             rememberTopAppBarState(),
             canScroll = { true })
     val isCollapsed = scrollBehavior.state.collapsedFraction > 0.55f
-
-    OnLifecycleEvent { _, event ->
-        if (event == Lifecycle.Event.ON_RESUME) {
-            homeItems = features
-        }
-    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -196,19 +187,7 @@ fun Home(
             ) {
 
                 item {
-                    Features(homeItems) {
-                        homeItems = homeItems.mapIndexed { j, item ->
-                            if (it == j) {
-                                item.copy(isChecked = !item.isChecked)
-                            } else {
-                                if (item.isChecked) {
-                                    item.copy(isChecked = false)
-                                } else {
-                                    item
-                                }
-                            }
-                        }
-                    }
+                    rpcContent()
                 }
             }
 
@@ -238,24 +217,15 @@ fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) ->
 @Composable
 fun HomeScreenPreview() {
     Home(
-        features = fakeFeatures,
         user = fakeUser,
         navigateToProfile = { },
         navigateToStyleAndAppearance = { },
         navigateToAbout = { },
-        navigateToRpcSettings = { }) {
-
-    }
-}
-
-val fakeFeatures = listOf(
-    HomeFeature(
-        title = "RPC",
-        icon = R.drawable.ic_dev_rpc,
-        shape = RoundedCornerShape(20.dp, 44.dp, 20.dp, 44.dp),
-        tooltipText = ToolTipContent.RPC_DOCS
+        navigateToRpcSettings = { },
+        navigateToLogsScreen = { },
+        rpcContent = { }
     )
-)
+}
 
 val fakeUser = User(
     accentColor = null,

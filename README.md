@@ -28,6 +28,7 @@ We have completely stripped away all unnecessary, bloated, and experimental logi
 - **🎵 Dynamic Media Detection**: Automatically detects and fetches your currently playing song, artist, and album, seamlessly displaying the high-res album cover art right on your Discord profile.
 - **📱 Foreground App Detection**: Elegantly showcases the currently running foreground app (e.g., YouTube, Spotify, or any custom app) along with its sleek launcher icon.
 - **⏱️ Precision Live Timestamps**: Accurately counts down/up your current media timeline. Intelligently hides timestamps when media is paused for an ultra-clean profile aesthetic.
+- **🎛️ Unified Home Screen Controls**: All of your RPC settings and toggles are now directly integrated into the Home Screen for maximum convenience. Instantly toggle options like **Show Album Name**, **Show App (Play) / Pause Icon**, and more!
 - **⚡ Absolute Peak Optimization**: The background service has been entirely rewritten and perfected with advanced coroutine lifecycle management. Features a highly efficient in-memory JSON cache, smart debouncing, and strict garbage collection to guarantee **0% lag**, **no memory leaks**, and **zero battery drain**.
 - **🎨 Material You Design**: A beautiful, pristine Android UI that perfectly adapts and blends with your system theme.
 - **🔒 Direct WebSocket Integration**: Connects flawlessly to the Discord Gateway, featuring instant, perfectly stable auto-reconnect capabilities.
@@ -64,3 +65,6 @@ git clone https://github.com/UniverseKing4/Discord-App-RPC.git
 > This app uses the Discord Gateway connection with a user token. Use this at your own risk. Custom rich presence has been widely used by the community for years with no known account issues, but we are not responsible for any problems that may arise with your account.
 
 **Discord App RPC** is an open-source project provided under the [GNU GPL 3.0 Open Source License](https://github.com/UniverseKing4/Discord-App-RPC/blob/main/LICENSE). You may use, reference, and modify the source code freely, but you may not distribute the modified and derived code as closed-source commercial software.
+
+## 🙏 Credits / Original Repository
+This project is a heavily modified and optimized fork of the amazing [Kizzy](https://github.com/dead8309/Kizzy) project. All original credits go to the Kizzy developers.

@@ -46,7 +46,6 @@ import com.my.rpc.feature_startup.StartUp
 import com.my.rpc.navigation.Routes
 import com.my.rpc.navigation.animatedComposable
 import com.my.rpc.preference.Prefs
-import xyz.dead8309.feature_rpc.RpcScreen
 import xyz.dead8309.feature_rpc.RpcViewmodel
 import xyz.dead8309.feature_rpc.apps.RpcAppsScreen
 
@@ -78,15 +77,13 @@ internal fun ComponentActivity.Rpc(
                         navController.navigate(Routes.PROFILE)
                     })
             }
+            val rpcViewModel by lazy {
+                viewModels<RpcViewmodel>()
+            }
+
             animatedComposable(Routes.HOME) {
                 val user = Prefs.getUser()
                 Home(
-                    features = homeFeaturesProvider(
-                        navigateTo = { navController.navigate(it) },
-                        hasUsageAccess = usageAccessStatus,
-                        hasNotificationAccess = notificationListenerAccess,
-                        userVerified = user?.verified == true
-                    ),
                     user = user,
                     navigateToProfile = {
                         navController.navigate(Routes.PROFILE)
@@ -102,6 +99,15 @@ internal fun ComponentActivity.Rpc(
                     },
                     navigateToLogsScreen = {
                         navController.navigate(Routes.LOGS_SCREEN)
+                    },
+                    rpcContent = {
+                        xyz.dead8309.feature_rpc.RpcSettingsContent(
+                            state = rpcViewModel.value.uiState.collectAsState().value,
+                            hasUsageAccess = usageAccessStatus.value,
+                            hasNotificationAccess = notificationListenerAccess.value,
+                            navigateToAppSelection = { navController.navigate(Routes.RPC_APPS) },
+                            onEvent = rpcViewModel.value::onEvent
+                        )
                     }
                 )
             }
@@ -162,23 +168,6 @@ internal fun ComponentActivity.Rpc(
                     onBackPressed = {
                         navController.popBackStack()
                     }
-                )
-            }
-
-            val rpcViewModel by lazy {
-                viewModels<RpcViewmodel>()
-            }
-
-            animatedComposable(Routes.RPC) {
-                RpcScreen(
-                    state = rpcViewModel.value.uiState.collectAsState().value,
-                    onEvent = rpcViewModel.value::onEvent,
-                    onBackPressed = { navController.popBackStack() },
-                    hasUsageAccess = usageAccessStatus.value,
-                    hasNotificationAccess = notificationListenerAccess.value,
-                    navigateToAppSelection = {
-                        navController.navigate(Routes.RPC_APPS)
-                    },
                 )
             }
 

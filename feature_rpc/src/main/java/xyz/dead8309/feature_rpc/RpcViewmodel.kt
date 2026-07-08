@@ -39,6 +39,7 @@ class RpcViewmodel @Inject constructor(
             templateDetails = Prefs[Prefs.RPC_TEMPLATE_DETAILS, ""],
             templateState = Prefs[Prefs.RPC_TEMPLATE_STATE, ""],
             showCoverArt = Prefs[Prefs.RPC_SHOW_COVER_ART, false],
+            showAlbumName = Prefs[Prefs.RPC_SHOW_ALBUM_NAME, false],
             showAppIcon = Prefs[Prefs.RPC_SHOW_APP_ICON, false],
             showPlaybackState = Prefs[Prefs.RPC_SHOW_PLAYBACK_STATE, false],
             showAppAndPauseIcon = Prefs[Prefs.RPC_SHOW_APP_AND_PAUSE_ICON, false],
@@ -124,16 +125,21 @@ class RpcViewmodel @Inject constructor(
                     }
                 }
                 is UiEvent.ToggleShowCoverArt -> {
-                    Prefs[Prefs.RPC_SHOW_COVER_ART] = event.enabled
-                    _uiState.update { it.copy(showCoverArt = event.enabled) }
+                    Prefs[Prefs.RPC_SHOW_COVER_ART] = event.isChecked
+                    _uiState.update { it.copy(showCoverArt = event.isChecked) }
+                }
+
+                is UiEvent.ToggleShowAlbumName -> {
+                    Prefs[Prefs.RPC_SHOW_ALBUM_NAME] = event.isChecked
+                    _uiState.update { it.copy(showAlbumName = event.isChecked) }
                 }
 
                 is UiEvent.ToggleShowAppIcon -> {
-                    Prefs[Prefs.RPC_SHOW_APP_ICON] = event.enabled
+                    Prefs[Prefs.RPC_SHOW_APP_ICON] = event.isChecked
                     _uiState.update {
-                        it.copy(showAppIcon = event.enabled)
+                        it.copy(showAppIcon = event.isChecked)
                     }
-                    if (event.enabled) {
+                    if (event.isChecked) {
                         Prefs[Prefs.RPC_SHOW_PLAYBACK_STATE] = false
                         Prefs[Prefs.RPC_SHOW_APP_AND_PAUSE_ICON] = false
                         _uiState.update { it.copy(showPlaybackState = false, showAppAndPauseIcon = false) }

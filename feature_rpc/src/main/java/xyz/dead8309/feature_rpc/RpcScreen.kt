@@ -73,10 +73,8 @@ private val completions = listOf(
     TemplateKeys.APP_NAME to R.string.completion_app_name,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RpcScreen(
-    onBackPressed: () -> Unit,
+fun RpcSettingsContent(
     state: UiState,
     hasUsageAccess: Boolean,
     hasNotificationAccess: Boolean,
@@ -85,239 +83,207 @@ fun RpcScreen(
 ) {
     val context = LocalContext.current
     var rpcRunning by remember { mutableStateOf(AppUtils.rpcRunning()) }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        rememberTopAppBarState(),
-        canScroll = { true }
-    )
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.main_rpc),
-                        style = MaterialTheme.typography.headlineLarge,
+    Column(modifier = Modifier.fillMaxWidth()) {
+        AnimatedVisibility(
+            visible = !hasUsageAccess
+        ) {
+            PreferencesHint(
+                title = stringResource(id = R.string.usage_access),
+                description = stringResource(id = R.string.usage_access_desc),
+                icon = Icons.Default.AppsOutage,
+            ) {
+                when (hasUsageAccess) {
+                    false -> context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                    else -> Unit
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = !hasNotificationAccess
+        ) {
+            PreferencesHint(
+                title = stringResource(id = R.string.permission_required),
+                description = stringResource(id = R.string.request_for_notification_access),
+                icon = Icons.Default.Warning,
+            ) {
+                if (!hasNotificationAccess) {
+                    context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                }
+            }
+        }
+
+        SwitchBar(
+            title = stringResource(id = R.string.enable_rpc),
+            isChecked = rpcRunning,
+            enabled = hasUsageAccess && hasNotificationAccess,
+        ) {
+            rpcRunning = !rpcRunning
+            when (rpcRunning) {
+                true -> {
+                    context.startService(Intent(context, Rpc::class.java))
+                }
+
+                false -> context.stopService(Intent(context, Rpc::class.java))
+            }
+        }
+
+        Column {
+            Subtitle(text = stringResource(R.string.general_settings))
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.enable_appsRpc),
+                description = stringResource(R.string.rpc_detect_apps),
+                isChecked = state.isAppsRpcPartEnabled,
+                onClick = {
+                    onEvent(UiEvent.ToggleAppsRpcPart(!state.isAppsRpcPartEnabled))
+                },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_apps),
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 16.dp)
+                            .size(24.dp),
+                        contentDescription = null
                     )
                 },
-                navigationIcon = { BackButton { onBackPressed() } },
-                scrollBehavior = scrollBehavior
             )
-        }
-    ) { paddingValues ->
-
-        Column(modifier = Modifier.padding(paddingValues)) {
-            AnimatedVisibility(
-                visible = !hasUsageAccess
-            ) {
-                PreferencesHint(
-                    title = stringResource(id = R.string.usage_access),
-                    description = stringResource(id = R.string.usage_access_desc),
-                    icon = Icons.Default.AppsOutage,
-                ) {
-                    when (hasUsageAccess) {
-                        false -> context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-                        else -> Unit
-                    }
-                }
-            }
-            AnimatedVisibility(
-                visible = !hasNotificationAccess
-            ) {
-                PreferencesHint(
-                    title = stringResource(id = R.string.permission_required),
-                    description = stringResource(id = R.string.request_for_notification_access),
-                    icon = Icons.Default.Warning,
-                ) {
-                    if (!hasNotificationAccess) {
-                        context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-                    }
-                }
-            }
-
-            SwitchBar(
-                title = stringResource(id = R.string.enable_rpc),
-                isChecked = rpcRunning,
-                enabled = hasUsageAccess && hasNotificationAccess,
-            ) {
-                rpcRunning = !rpcRunning
-                when (rpcRunning) {
-                    true -> {
-                        context.startService(Intent(context, Rpc::class.java))
-                    }
-
-                    false -> context.stopService(Intent(context, Rpc::class.java))
-                }
-            }
-            LazyColumn {
-                item {
-                    Subtitle(text = stringResource(R.string.general_settings))
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.enable_appsRpc),
-                        description = stringResource(R.string.rpc_detect_apps),
-                        isChecked = state.isAppsRpcPartEnabled,
-                        onClick = {
-                            onEvent(UiEvent.ToggleAppsRpcPart(!state.isAppsRpcPartEnabled))
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_apps),
-                                modifier = Modifier
-                                    .padding(start = 8.dp, end = 16.dp)
-                                    .size(24.dp),
-                                contentDescription = null
-                            )
-                        },
-                    )
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.enable_mediaRpc),
-                        description = stringResource(R.string.rpc_detect_media),
-                        isChecked = state.isMediaRpcPartEnabled,
-                        onClick = {
-                            onEvent(UiEvent.ToggleMediaRpcPart(!state.isMediaRpcPartEnabled))
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_media_rpc),
-                                modifier = Modifier
-                                    .padding(start = 8.dp, end = 16.dp)
-                                    .size(24.dp),
-                                contentDescription = null
-                            )
-                        },
-                    )
-                }
-                item {
-                    SettingItem(
-                        title = stringResource(R.string.app_preferences),
-                        description = stringResource(R.string.app_preferences_desc),
-                        icon = Icons.Outlined.AppSettingsAlt
-                    ) {
-                        navigateToAppSelection()
-                    }
-                }
-                item {
-                    Subtitle(
-                        text = stringResource(R.string.main_mediaRpc)
-                    )
-                }
-
-                // Media Display Options
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.show_cover_art),
-                        description = stringResource(R.string.show_cover_art_desc),
-                        isChecked = state.showCoverArt,
-                        onClick = {
-                            onEvent(UiEvent.ToggleShowCoverArt(!state.showCoverArt))
-                        },
-                        icon = Icons.Outlined.Image,
-                    )
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.show_app_icon),
-                        isChecked = state.showAppIcon,
-                        onClick = {
-                            onEvent(UiEvent.ToggleShowAppIcon(!state.showAppIcon))
-                        },
-                        icon = Icons.Outlined.Apps,
-                    )
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.show_playback_state),
-                        isChecked = state.showPlaybackState,
-                        onClick = {
-                            onEvent(UiEvent.ToggleShowPlaybackState(!state.showPlaybackState))
-                        },
-                        icon = Icons.Default.PlayCircle
-                    )
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.show_app_and_pause_icon),
-                        description = stringResource(R.string.show_app_and_pause_icon_desc),
-                        isChecked = state.showAppAndPauseIcon,
-                        onClick = {
-                            onEvent(UiEvent.ToggleShowAppAndPauseIcon(!state.showAppAndPauseIcon))
-                        },
-                        icon = Icons.Default.PlayCircleOutline
-                    )
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.enable_timestamps),
-                        isChecked = state.enableTimestamps,
-                        onClick = {
-                            onEvent(UiEvent.ToggleEnableTimestamps(!state.enableTimestamps))
-                        },
-                        icon = Icons.Default.Timer
-                    )
-                }
-                item {
-                    PreferenceSwitch(
-                        title = stringResource(R.string.hide_on_pause),
-                        isChecked = state.hideOnPause,
-                        onClick = {
-                            onEvent(UiEvent.ToggleHideOnPause(!state.hideOnPause))
-                        },
-                        icon = Icons.Default.PauseCircle
-                    )
-                }
-                item {
-                    Subtitle(text = stringResource(R.string.advance_settings))
-                }
-                item {
-                    RpcFieldWithCompletions(
-                        value = state.templateName,
-                        label = R.string.activity_name,
-                        onValueChange = { onEvent(UiEvent.SetTemplateName(it)) },
-                        completionList = completions
-                    )
-                }
-                item {
-                    RpcFieldWithCompletions(
-                        value = state.templateDetails,
-                        label = R.string.activity_details,
-                        onValueChange = { onEvent(UiEvent.SetTemplateDetails(it)) },
-                        completionList = completions
-                    )
-                }
-                item {
-                    RpcFieldWithCompletions(
-                        value = state.templateState,
-                        label = R.string.activity_state,
-                        onValueChange = { onEvent(UiEvent.SetTemplateState(it)) },
-                        completionList = completions
-                    )
-                }
-
-                item {
-                    Column(
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.enable_mediaRpc),
+                description = stringResource(R.string.rpc_detect_media),
+                isChecked = state.isMediaRpcPartEnabled,
+                onClick = {
+                    onEvent(UiEvent.ToggleMediaRpcPart(!state.isMediaRpcPartEnabled))
+                },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_media_rpc),
                         modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = null,
-                        )
-                        Text(
-                            text = stringResource(R.string.rpc_templates_note),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Light,
-                        )
-                    }
-                }
+                            .padding(start = 8.dp, end = 16.dp)
+                            .size(24.dp),
+                        contentDescription = null
+                    )
+                },
+            )
+            
+            SettingItem(
+                title = stringResource(R.string.app_preferences),
+                description = stringResource(R.string.app_preferences_desc),
+                icon = Icons.Outlined.AppSettingsAlt
+            ) {
+                navigateToAppSelection()
+            }
+            
+            Subtitle(
+                text = stringResource(R.string.main_mediaRpc)
+            )
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.show_cover_art),
+                description = stringResource(R.string.show_cover_art_desc),
+                isChecked = state.showCoverArt,
+                onClick = {
+                    onEvent(UiEvent.ToggleShowCoverArt(!state.showCoverArt))
+                },
+                icon = Icons.Outlined.Image,
+            )
+
+            PreferenceSwitch(
+                title = stringResource(R.string.show_album_name),
+                description = stringResource(R.string.show_album_name_desc),
+                isChecked = state.showAlbumName,
+                onClick = {
+                    onEvent(UiEvent.ToggleShowAlbumName(!state.showAlbumName))
+                },
+                icon = Icons.Outlined.Info,
+            )
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.show_app_and_pause_icon),
+                description = stringResource(R.string.show_app_and_pause_icon_desc),
+                isChecked = state.showAppAndPauseIcon,
+                onClick = {
+                    onEvent(UiEvent.ToggleShowAppAndPauseIcon(!state.showAppAndPauseIcon))
+                },
+                icon = Icons.Default.PlayCircleOutline
+            )
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.show_app_icon),
+                isChecked = state.showAppIcon,
+                onClick = {
+                    onEvent(UiEvent.ToggleShowAppIcon(!state.showAppIcon))
+                },
+                icon = Icons.Outlined.Apps,
+            )
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.show_playback_state),
+                isChecked = state.showPlaybackState,
+                onClick = {
+                    onEvent(UiEvent.ToggleShowPlaybackState(!state.showPlaybackState))
+                },
+                icon = Icons.Default.PlayCircle
+            )
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.enable_timestamps),
+                isChecked = state.enableTimestamps,
+                onClick = {
+                    onEvent(UiEvent.ToggleEnableTimestamps(!state.enableTimestamps))
+                },
+                icon = Icons.Default.Timer
+            )
+            
+            PreferenceSwitch(
+                title = stringResource(R.string.hide_on_pause),
+                isChecked = state.hideOnPause,
+                onClick = {
+                    onEvent(UiEvent.ToggleHideOnPause(!state.hideOnPause))
+                },
+                icon = Icons.Default.PauseCircle
+            )
+            
+            Subtitle(text = stringResource(R.string.advance_settings))
+            
+            RpcFieldWithCompletions(
+                value = state.templateName,
+                label = R.string.activity_name,
+                onValueChange = { onEvent(UiEvent.SetTemplateName(it)) },
+                completionList = completions
+            )
+            
+            RpcFieldWithCompletions(
+                value = state.templateDetails,
+                label = R.string.activity_details,
+                onValueChange = { onEvent(UiEvent.SetTemplateDetails(it)) },
+                completionList = completions
+            )
+            
+            RpcFieldWithCompletions(
+                value = state.templateState,
+                label = R.string.activity_state,
+                onValueChange = { onEvent(UiEvent.SetTemplateState(it)) },
+                completionList = completions
+            )
+            
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                )
+                Text(
+                    text = stringResource(R.string.rpc_templates_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Light,
+                )
             }
         }
     }
