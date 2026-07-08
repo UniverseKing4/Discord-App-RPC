@@ -39,7 +39,7 @@ class RpcViewmodel @Inject constructor(
             templateDetails = Prefs[Prefs.RPC_TEMPLATE_DETAILS, ""],
             templateState = Prefs[Prefs.RPC_TEMPLATE_STATE, ""],
             showCoverArt = Prefs[Prefs.RPC_SHOW_COVER_ART, false],
-            showAlbumName = Prefs[Prefs.RPC_SHOW_ALBUM_NAME, false],
+            showAlbumName = Prefs[Prefs.RPC_SHOW_ALBUM_NAME, true],
             showAppIcon = Prefs[Prefs.RPC_SHOW_APP_ICON, false],
             showPlaybackState = Prefs[Prefs.RPC_SHOW_PLAYBACK_STATE, false],
             showAppAndPauseIcon = Prefs[Prefs.RPC_SHOW_APP_AND_PAUSE_ICON, false],
