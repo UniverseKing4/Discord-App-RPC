@@ -172,11 +172,14 @@ fun RpcAppsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
                 ) {
-                    items(state.installedApps.filter {
-                        searchText.isEmpty() ||
-                                it.name.contains(searchText, ignoreCase = true) ||
-                                it.pkg.contains(searchText, ignoreCase = true)
-                    }) { app ->
+                    val filteredApps = remember(state.installedApps, searchText) {
+                        state.installedApps.filter {
+                            searchText.isEmpty() ||
+                                    it.name.contains(searchText, ignoreCase = true) ||
+                                    it.pkg.contains(searchText, ignoreCase = true)
+                        }
+                    }
+                    items(filteredApps) { app ->
                         val isChecked = state.enabledApps[app.pkg] ?: false
                         val selectedTypeId = state.appActivityTypes[app.pkg] ?: 0
                         val selectedType = Constants.ACTIVITY_TYPE.entries

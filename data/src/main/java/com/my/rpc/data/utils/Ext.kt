@@ -52,7 +52,7 @@ suspend fun HttpResponse.toImageURL(): String? {
 suspend fun HttpResponse.toExternalAsset(): String? {
     return try {
         if (this.status == HttpStatusCode.OK)
-            "mp:" + this.body<Array<ExternalAsset>>().first().externalAssetPath
+            "mp:" + this.body<Array<ExternalAsset>>().firstOrNull()?.externalAssetPath
         else
             null
     } catch (e: Exception) {
@@ -80,8 +80,9 @@ fun Bitmap?.toFile(context: Context, outputPathFolder: String): File {
     val dir = File(context.filesDir.toString() + File.separator + outputPathFolder)
     dir.mkdirs()
     val image = File(dir, "Temp.png")
+    if (this == null) return image
     FileOutputStream(image).use {
-        this?.compress(Bitmap.CompressFormat.PNG, 100, it)
+        this.compress(Bitmap.CompressFormat.PNG, 100, it)
     }
     return image
 }
@@ -171,7 +172,9 @@ fun String.cleanAppName(): String {
         " Vanced", " Extended", " Mod", " Premium"
     )
     for (suffix in suffixes) {
-        name = name.replace(suffix, "", ignoreCase = true)
+        if (name.contains(suffix, ignoreCase = true)) {
+            name = name.replace(suffix, "", ignoreCase = true)
+        }
     }
     return name.trim()
 }

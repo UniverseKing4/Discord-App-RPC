@@ -106,7 +106,7 @@ fun Home(
             ModalDrawerSheet(modifier = Modifier.width(300.dp)) {
                 SettingsDrawer(
                     user = user,
-                    showRpcQuickieRequestItem = !RpcTileService.tileAdded.value,
+                    showRpcQuickieRequestItem = !RpcTileService.tileAdded,
                     onRequestAddTile = {
                         val cn = ComponentName(ctx, RpcTileService::class.java)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

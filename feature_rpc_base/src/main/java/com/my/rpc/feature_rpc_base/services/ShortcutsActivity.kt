@@ -55,9 +55,9 @@ class ShortcutsActivity : Activity() {
 
     companion object {
         object Intents {
-            val START_RPC_SHORTCUT =
+            const val START_RPC_SHORTCUT =
                 "com.my.rpc.intent.action.START_RPC"
-            val STOP_RPC = "com.my.rpc.intent.action.STOP_RPC"
+            const val STOP_RPC = "com.my.rpc.intent.action.STOP_RPC"
         }
     }
 }

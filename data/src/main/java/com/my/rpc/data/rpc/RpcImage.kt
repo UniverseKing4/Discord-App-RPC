@@ -19,21 +19,26 @@ import com.my.rpc.preference.Prefs
 import com.my.rpc.data.utils.getAppInfo
 import com.my.rpc.data.utils.toBitmap
 import com.my.rpc.data.utils.toFile
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.concurrent.ConcurrentHashMap
 
 sealed class RpcImage {
     abstract suspend fun resolveImage(repository: RpcRepository): String?
 
     companion object {
-        private var savedAppIcons: HashMap<String, String>? = null
-        private var savedArtworks: HashMap<String, String>? = null
+        private var savedAppIcons: ConcurrentHashMap<String, String>? = null
+        private var savedArtworks: ConcurrentHashMap<String, String>? = null
 
-        fun getSavedAppIcons(): HashMap<String, String> {
+        @Synchronized
+        fun getSavedAppIcons(): ConcurrentHashMap<String, String> {
             if (savedAppIcons == null) {
                 val data = Prefs[Prefs.SAVED_IMAGES, "{}"]
-                savedAppIcons = try { Json.decodeFromString(data) } catch (e: Exception) { HashMap() }
+                savedAppIcons = try {
+                    ConcurrentHashMap(Json.decodeFromString<HashMap<String, String>>(data))
+                } catch (e: Exception) {
+                    ConcurrentHashMap()
+                }
             }
             return savedAppIcons!!
         }
@@ -41,13 +46,18 @@ sealed class RpcImage {
         fun saveAppIcon(packageName: String, url: String) {
             val map = getSavedAppIcons()
             map[packageName] = url
-            Prefs[Prefs.SAVED_IMAGES] = Json.encodeToString(map)
+            Prefs[Prefs.SAVED_IMAGES] = Json.encodeToString(HashMap(map))
         }
 
-        fun getSavedArtworks(): HashMap<String, String> {
+        @Synchronized
+        fun getSavedArtworks(): ConcurrentHashMap<String, String> {
             if (savedArtworks == null) {
                 val data = Prefs[Prefs.SAVED_ARTWORK, "{}"]
-                savedArtworks = try { Json.decodeFromString(data) } catch (e: Exception) { HashMap() }
+                savedArtworks = try {
+                    ConcurrentHashMap(Json.decodeFromString<HashMap<String, String>>(data))
+                } catch (e: Exception) {
+                    ConcurrentHashMap()
+                }
             }
             return savedArtworks!!
         }
@@ -55,7 +65,7 @@ sealed class RpcImage {
         fun saveArtwork(schema: String, url: String) {
             val map = getSavedArtworks()
             map[schema] = url
-            Prefs[Prefs.SAVED_ARTWORK] = Json.encodeToString(map)
+            Prefs[Prefs.SAVED_ARTWORK] = Json.encodeToString(HashMap(map))
         }
 
         fun clearCache() {

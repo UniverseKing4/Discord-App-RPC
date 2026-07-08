@@ -23,7 +23,7 @@ import rpc.gateway.entities.presence.Metadata
 import rpc.gateway.entities.presence.Party
 import rpc.gateway.entities.presence.Presence
 import rpc.gateway.entities.presence.Timestamps
-import kotlinx.coroutines.isActive
+
 
 class RpcRPC(
     private val token: String,
@@ -46,8 +46,8 @@ class RpcRPC(
     private var stopTimestamps: Long? = null
     private var type: Int = 0
     private var platform: String? = null
-    private var buttons = ArrayList<String>()
-    private var buttonUrl = ArrayList<String>()
+    private val buttons = ArrayList<String>(2)
+    private val buttonUrl = ArrayList<String>(2)
     private var url: String? = null
 
     fun closeRPC() {
@@ -184,9 +184,7 @@ class RpcRPC(
      */
 
     fun setType(type: Int): RpcRPC {
-        if (type in 0..5)
-            this.type = type
-        else this.type = 0
+        this.type = if (type in 0..3 || type == 5) type else 0
         return this
     }
 
@@ -216,6 +214,8 @@ class RpcRPC(
      * @return
      */
     fun setButton1(button1_Text: String?): RpcRPC {
+        buttons.clear()
+        buttonUrl.clear()
         button1_Text?.let { buttons.add(it) }
         return this
     }
@@ -287,24 +287,26 @@ class RpcRPC(
                         largeText = largeText?.sanitize(),
                         smallText = smallText?.sanitize()
                     ).takeIf { largeImage != null || smallImage != null },
-                    buttons = buttons.takeIf { buttons.size > 0 },
-                    metadata = Metadata(buttonUrls = buttonUrl).takeIf { buttonUrl.size > 0 },
+                    buttons = buttons.toList().takeIf { it.isNotEmpty() },
+                    metadata = Metadata(buttonUrls = buttonUrl.toList()).takeIf { buttonUrl.isNotEmpty() },
                     applicationId = applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID,
                     url = url
                 )
             ),
             afk = true,
-            since = startTimestamps.takeIf { startTimestamps != null }?: System.currentTimeMillis(),
+            since = startTimestamps ?: System.currentTimeMillis(),
             status = status
         )
         connectToWebSocket()
     }
     private suspend fun connectToWebSocket() {
-        if (!isUserTokenValid())
+        if (!isUserTokenValid()) {
             logger.e(
                 tag = "RpcRPC",
                 event = "Token Seems to be invalid, Please Login if you haven't"
             )
+            return
+        }
         discordWebSocket.connect()
         discordWebSocket.sendActivity(presence)
     }
@@ -335,8 +337,8 @@ class RpcRPC(
                                 smallText = commonRpc.smallText?.sanitize()
                             ).takeIf { commonRpc.largeImage != null || commonRpc.smallImage != null },
                         party = party.takeIf { party != null },
-                        buttons = buttons.takeIf { buttons.size > 0 },
-                        metadata = Metadata(buttonUrls = buttonUrl).takeIf { buttonUrl.size > 0 },
+                        buttons = buttons.toList().takeIf { it.isNotEmpty() },
+                        metadata = Metadata(buttonUrls = buttonUrl.toList()).takeIf { buttonUrl.isNotEmpty() },
                         applicationId = applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID
 
                     )

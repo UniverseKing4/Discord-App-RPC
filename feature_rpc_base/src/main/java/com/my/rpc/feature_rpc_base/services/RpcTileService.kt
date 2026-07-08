@@ -22,7 +22,7 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.compose.runtime.mutableStateOf
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.my.rpc.feature_rpc_base.AppUtils
 import com.my.rpc.preference.Prefs
@@ -58,7 +58,7 @@ class RpcTileService : TileService() {
 
     override fun onTileAdded() {
         super.onTileAdded()
-        tileAdded.value = true
+        tileAdded = true
     }
 
     private fun createRpcChoosingDialog(ctx: Context): Dialog {
@@ -110,7 +110,8 @@ class RpcTileService : TileService() {
     }
 
     companion object {
-        val tileAdded = mutableStateOf(false)
+        @Volatile
+        var tileAdded = false
     }
 }
 

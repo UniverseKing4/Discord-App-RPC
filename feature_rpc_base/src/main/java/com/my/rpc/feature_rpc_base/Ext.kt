@@ -40,7 +40,7 @@ internal suspend fun Notification.Builder.setLargeIcon(
         is RpcImage.ExternalImage -> rpcImage.image
     }
 
-    val imageLoader = coil.ImageLoader(context)
+    val imageLoader = NotificationImageLoaderHolder.get(context)
     val request = coil.request.ImageRequest.Builder(context)
         .data(data)
         .target(
@@ -79,5 +79,17 @@ internal suspend fun Notification.Builder.setLargeIcon(
 
     continuation.invokeOnCancellation {
         disposable.dispose()
+    }
+}
+
+/** Singleton holder for ImageLoader used in notification icon loading. Prevents memory leak from creating a new ImageLoader per update. */
+private object NotificationImageLoaderHolder {
+    @Volatile
+    private var instance: coil.ImageLoader? = null
+
+    fun get(context: Context): coil.ImageLoader {
+        return instance ?: synchronized(this) {
+            instance ?: coil.ImageLoader(context.applicationContext).also { instance = it }
+        }
     }
 }

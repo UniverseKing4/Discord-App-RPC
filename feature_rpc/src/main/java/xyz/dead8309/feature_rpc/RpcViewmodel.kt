@@ -54,7 +54,7 @@ class RpcViewmodel @Inject constructor(
     }
 
     private fun loadInstalledApps() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.IO) {
             val appList = getInstalledApps(
                 context = context,
                 isEnabled = Prefs::isRpcAppEnabled
@@ -78,12 +78,12 @@ class RpcViewmodel @Inject constructor(
             when (event) {
                 is UiEvent.ToggleAppsRpcPart -> {
                     Prefs[Prefs.RPC_USE_APPS_RPC] = event.enabled
-                    _uiState.value = _uiState.value.copy(isAppsRpcPartEnabled = event.enabled)
+                    _uiState.update { it.copy(isAppsRpcPartEnabled = event.enabled) }
                 }
 
                 is UiEvent.ToggleMediaRpcPart -> {
                     Prefs[Prefs.RPC_USE_MEDIA_RPC] = event.enabled
-                    _uiState.value = _uiState.value.copy(isMediaRpcPartEnabled = event.enabled)
+                    _uiState.update { it.copy(isMediaRpcPartEnabled = event.enabled) }
                 }
 
                 is UiEvent.SetTemplateName -> {

@@ -53,11 +53,15 @@ class TemplateProcessor(
             result = result.replace(TemplateKeys.APP_NAME, detectedAppInfo.name)
         }
 
-        // NOTE: remove unreplaced placeholders
-        result = result.replace(
-            Regex("\\{\\{(media|app)_[^}]+\\}\\}"), ""
-        )
+        // Remove unreplaced placeholders
+        result = result.replace(UNREPLACED_PLACEHOLDER_REGEX, "")
 
         return result
+    }
+
+    companion object {
+        /** Pre-compiled regex for removing unreplaced template placeholders. */
+        private val UNREPLACED_PLACEHOLDER_REGEX =
+            Regex("\\{\\{(media|app)_[^}]+\\}\\}")
     }
 }

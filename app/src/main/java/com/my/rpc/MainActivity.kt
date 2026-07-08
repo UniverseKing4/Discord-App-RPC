@@ -22,7 +22,6 @@ import com.my.rpc.ui.theme.LocalDarkTheme
 import com.my.rpc.ui.theme.LocalDynamicColorSwitch
 import com.my.rpc.ui.theme.SettingsProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -39,11 +38,10 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(0, 0, 0, 0)
             insets
         }
-        runBlocking {
-            if (Build.VERSION.SDK_INT < 33)
-                AppCompatDelegate.setApplicationLocales(
-                    LocaleListCompat.forLanguageTags(getLanguageConfig())
-                )
+        if (Build.VERSION.SDK_INT < 33) {
+            AppCompatDelegate.setApplicationLocales(
+                LocaleListCompat.forLanguageTags(getLanguageConfig())
+            )
         }
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)

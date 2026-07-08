@@ -13,10 +13,16 @@ class OpCodeSerializer : KSerializer<OpCode> {
 
     override fun deserialize(decoder: Decoder): OpCode {
         val opCode = decoder.decodeInt()
-        return OpCode.values().firstOrNull { it.value == opCode } ?: throw IllegalArgumentException("Unknown OpCode $opCode")
+        return opCodeMap[opCode] ?: OpCode.UNKNOWN
     }
 
     override fun serialize(encoder: Encoder, value: OpCode) {
         encoder.encodeInt(value.value)
+    }
+
+    companion object {
+        /** Pre-built O(1) lookup map instead of linear scan on every message. */
+        private val opCodeMap: Map<Int, OpCode> =
+            OpCode.entries.associateBy { it.value }
     }
 }
